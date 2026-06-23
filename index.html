@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Jeevan Health Assistant</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    :root{
+      --green:#2e7d5e;
+      --green-light:#e8f5f0;
+      --green-dark:#1a5c43;
+      --orange:#e07b39;
+      --text:#1a1a2e;
+      --muted:#5a6a7a;
+      --white:#ffffff;
+      --bg:#f7faf9;
+    }
+    body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);}
+    nav{background:var(--white);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 12px rgba(0,0,0,0.07);position:sticky;top:0;z-index:100;}
+    .logo{display:flex;align-items:center;gap:0.6rem;}
+    .logo-icon{width:40px;height:40px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;}
+    .logo-icon svg{width:22px;height:22px;fill:white;}
+    .logo-text{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--green-dark);}
+    .logo-sub{font-size:0.65rem;color:var(--muted);display:block;margin-top:-4px;letter-spacing:0.05em;}
+    .nav-links{display:flex;gap:1.5rem;align-items:center;}
+    .nav-links a{text-decoration:none;color:var(--muted);font-size:0.9rem;font-weight:500;transition:color 0.2s;}
+    .nav-links a:hover{color:var(--green);}
+    .btn-nav{background:var(--green);color:white!important;padding:0.5rem 1.2rem;border-radius:24px;font-size:0.85rem!important;}
+    .btn-nav:hover{background:var(--green-dark)!important;}
+
+    /* Hero */
+    .hero{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;padding:5rem 4rem;max-width:1200px;margin:0 auto;}
+    .hero-badge{display:inline-block;background:var(--green-light);color:var(--green);font-size:0.78rem;font-weight:600;padding:0.3rem 0.9rem;border-radius:20px;margin-bottom:1rem;letter-spacing:0.04em;}
+    .hero h1{font-family:'Playfair Display',serif;font-size:3rem;line-height:1.2;margin-bottom:1rem;color:var(--text);}
+    .hero h1 span{color:var(--green);}
+    .hero p{font-size:1rem;color:var(--muted);line-height:1.8;margin-bottom:2rem;}
+    .hero-btns{display:flex;gap:1rem;flex-wrap:wrap;}
+    .btn-primary{background:var(--green);color:white;padding:0.85rem 2rem;border-radius:30px;text-decoration:none;font-weight:600;font-size:0.95rem;transition:background 0.2s,transform 0.2s;}
+    .btn-primary:hover{background:var(--green-dark);transform:translateY(-2px);}
+    .btn-secondary{background:transparent;color:var(--green);padding:0.85rem 2rem;border-radius:30px;text-decoration:none;font-weight:600;font-size:0.95rem;border:2px solid var(--green);transition:all 0.2s;}
+    .btn-secondary:hover{background:var(--green-light);}
+    .hero-visual{background:var(--green-light);border-radius:24px;padding:2.5rem;display:flex;flex-direction:column;gap:1rem;}
+    .hero-card{background:white;border-radius:16px;padding:1.2rem 1.5rem;display:flex;align-items:center;gap:1rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);}
+    .hero-card-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .ic-green{background:var(--green-light);}
+    .ic-orange{background:#fef0e7;}
+    .hero-card-icon svg{width:24px;height:24px;}
+    .hero-card-title{font-weight:600;font-size:0.95rem;color:var(--text);}
+    .hero-card-sub{font-size:0.78rem;color:var(--muted);}
+
+    /* Stats */
+    .stats{background:var(--green);padding:3rem 4rem;display:flex;justify-content:center;gap:6rem;}
+    .stat{text-align:center;color:white;}
+    .stat-num{font-family:'Playfair Display',serif;font-size:2.5rem;font-weight:700;}
+    .stat-label{font-size:0.85rem;opacity:0.85;margin-top:0.3rem;}
+
+    /* Services */
+    .section{padding:5rem 4rem;max-width:1200px;margin:0 auto;}
+    .section-badge{display:inline-block;background:var(--green-light);color:var(--green);font-size:0.78rem;font-weight:600;padding:0.3rem 0.9rem;border-radius:20px;margin-bottom:0.8rem;}
+    .section h2{font-family:'Playfair Display',serif;font-size:2.2rem;margin-bottom:0.8rem;}
+    .section-sub{color:var(--muted);font-size:0.95rem;margin-bottom:3rem;max-width:500px;}
+    .services-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;}
+    .service-card{background:white;border-radius:20px;padding:2rem;box-shadow:0 4px 20px rgba(0,0,0,0.06);transition:transform 0.2s,box-shadow 0.2s;text-decoration:none;color:inherit;display:block;}
+    .service-card:hover{transform:translateY(-4px);box-shadow:0 8px 32px rgba(0,0,0,0.10);}
+    .service-icon{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:1.2rem;}
+    .service-icon svg{width:28px;height:28px;}
+    .service-card h3{font-size:1.15rem;font-weight:600;margin-bottom:0.6rem;}
+    .service-card p{font-size:0.88rem;color:var(--muted);line-height:1.7;}
+    .service-tag{display:inline-block;font-size:0.72rem;font-weight:600;padding:0.2rem 0.7rem;border-radius:12px;margin-top:1rem;}
+
+    /* About */
+    .about-section{background:white;padding:5rem 4rem;}
+    .about-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;}
+    .about-img{background:var(--green-light);border-radius:24px;padding:3rem;text-align:center;}
+    .about-img svg{width:180px;height:180px;}
+    .about-text .section-badge{display:inline-block;}
+    .about-text h2{font-family:'Playfair Display',serif;font-size:2rem;margin:0.8rem 0;}
+    .about-text p{color:var(--muted);line-height:1.8;font-size:0.95rem;margin-bottom:1rem;}
+    .features-list{list-style:none;display:flex;flex-direction:column;gap:0.6rem;margin-top:1.2rem;}
+    .features-list li{display:flex;align-items:center;gap:0.7rem;font-size:0.9rem;color:var(--text);}
+    .check{width:20px;height:20px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .check svg{width:12px;height:12px;stroke:white;fill:none;stroke-width:2.5;}
+
+    /* Contact */
+    .contact-section{padding:5rem 4rem;max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:4rem;}
+    .contact-info h2{font-family:'Playfair Display',serif;font-size:2rem;margin:0.8rem 0 1rem;}
+    .contact-item{display:flex;align-items:flex-start;gap:1rem;margin-bottom:1.5rem;}
+    .contact-item-icon{width:44px;height:44px;background:var(--green-light);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .contact-item-icon svg{width:20px;height:20px;stroke:var(--green);fill:none;stroke-width:2;}
+    .contact-item-label{font-size:0.78rem;color:var(--muted);margin-bottom:0.2rem;}
+    .contact-item-value{font-size:0.95rem;font-weight:500;}
+    .contact-form{background:white;border-radius:20px;padding:2rem;box-shadow:0 4px 20px rgba(0,0,0,0.07);}
+    .contact-form h3{font-size:1.1rem;font-weight:600;margin-bottom:1.5rem;}
+    .form-group{margin-bottom:1rem;}
+    .form-group label{display:block;font-size:0.82rem;font-weight:500;color:var(--muted);margin-bottom:0.4rem;}
+    .form-group input,.form-group textarea{width:100%;padding:0.75rem 1rem;border:1.5px solid #e2e8f0;border-radius:10px;font-family:'Poppins',sans-serif;font-size:0.9rem;outline:none;transition:border 0.2s;}
+    .form-group input:focus,.form-group textarea:focus{border-color:var(--green);}
+    .form-group textarea{resize:vertical;min-height:100px;}
+    .btn-submit{width:100%;background:var(--green);color:white;padding:0.85rem;border:none;border-radius:10px;font-family:'Poppins',sans-serif;font-size:0.95rem;font-weight:600;cursor:pointer;transition:background 0.2s;}
+    .btn-submit:hover{background:var(--green-dark);}
+
+    /* Footer */
+    footer{background:var(--text);color:white;padding:2rem 4rem;text-align:center;}
+    footer p{font-size:0.85rem;opacity:0.7;}
+    footer span{color:var(--orange);}
+
+    /* Login buttons section */
+    .login-section{background:var(--green-light);padding:4rem;text-align:center;}
+    .login-section h2{font-family:'Playfair Display',serif;font-size:2rem;margin-bottom:0.6rem;}
+    .login-section p{color:var(--muted);margin-bottom:2rem;}
+    .login-btns{display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;}
+    .btn-login{padding:1rem 2.5rem;border-radius:30px;text-decoration:none;font-weight:600;font-size:1rem;transition:all 0.2s;}
+    .btn-admin{background:var(--green);color:white;}
+    .btn-admin:hover{background:var(--green-dark);transform:translateY(-2px);}
+    .btn-user{background:var(--orange);color:white;}
+    .btn-user:hover{background:#c96a2a;transform:translateY(-2px);}
+
+    @media(max-width:768px){
+      .hero{grid-template-columns:1fr;padding:3rem 1.5rem;}
+      .hero h1{font-size:2rem;}
+      .stats{gap:2rem;padding:2rem 1.5rem;flex-wrap:wrap;}
+      .section{padding:3rem 1.5rem;}
+      .services-grid{grid-template-columns:1fr;}
+      .about-inner{grid-template-columns:1fr;padding:3rem 1.5rem;}
+      .contact-section{grid-template-columns:1fr;padding:3rem 1.5rem;}
+      .about-section{padding:3rem 1.5rem;}
+      .login-section{padding:3rem 1.5rem;}
+      footer{padding:2rem 1.5rem;}
+      nav{padding:1rem;}
+      .nav-links{gap:0.8rem;}
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+    </div>
+    <div>
+      <span class="logo-text">Jeevan Health Assistant</span>
+      <span class="logo-sub">Jeevan Sandhya Old Age Home</span>
+    </div>
+  </div>
+  <div class="nav-links">
+    <a href="#services">Services</a>
+    <a href="#about">About</a>
+    <a href="#contact">Contact</a>
+    <a href="admin-login.html" class="btn-nav">Admin Login</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div>
+    <span class="hero-badge">✦ Caring for Our Elders</span>
+    <h1>Smart Health Care for <span>Jeevan Sandhya</span></h1>
+    <p>A dedicated health assistant platform for the residents of Jeevan Sandhya Old Age Home. Never miss a medicine, get instant AI-powered health guidance.</p>
+    <div class="hero-btns">
+      <a href="user-login.html" class="btn-primary">Resident Login</a>
+      <a href="#services" class="btn-secondary">Learn More</a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-card">
+      <div class="hero-card-icon ic-green">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#2e7d5e" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+      </div>
+      <div>
+        <div class="hero-card-title">Medicine Reminder</div>
+        <div class="hero-card-sub">Doctor-set schedules, on-time alerts</div>
+      </div>
+    </div>
+    <div class="hero-card">
+      <div class="hero-card-icon ic-orange">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#e07b39" stroke-width="2"><path d="M12 18.5a6.5 6.5 0 100-13 6.5 6.5 0 000 13z"/><path d="M12 8v4l3 3"/><path d="M19.5 4.5l-1.5 1.5M4.5 4.5L6 6M12 2v2M2 12h2M20 12h2"/></svg>
+      </div>
+      <div>
+        <div class="hero-card-title">AI Symptom Checker</div>
+        <div class="hero-card-sub">Speak symptoms, get instant guidance</div>
+      </div>
+    </div>
+    <div class="hero-card">
+      <div class="hero-card-icon ic-green">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#2e7d5e" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      </div>
+      <div>
+        <div class="hero-card-title">Admin Dashboard</div>
+        <div class="hero-card-sub">Track resident health & activity</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats -->
+<div class="stats">
+  <div class="stat"><div class="stat-num">24/7</div><div class="stat-label">Health Monitoring</div></div>
+  <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Medicine Reminders</div></div>
+  <div class="stat"><div class="stat-num">AI</div><div class="stat-label">Symptom Analysis</div></div>
+  <div class="stat"><div class="stat-num">Free</div><div class="stat-label">For Residents</div></div>
+</div>
+
+<!-- Services -->
+<section class="section" id="services">
+  <span class="section-badge">Our Services</span>
+  <h2>Everything Residents Need</h2>
+  <p class="section-sub">Two powerful tools designed specifically for the elderly residents of Jeevan Sandhya.</p>
+  <div class="services-grid">
+    <a href="user-login.html" class="service-card">
+      <div class="service-icon" style="background:#e8f5f0;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#2e7d5e" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/><path d="M9 12h6M9 16h4"/></svg>
+      </div>
+      <h3>Medicine Reminder</h3>
+      <p>Doctors add your medicine schedule. You receive timely reminders so you never miss a dose. Simple and reliable.</p>
+      <span class="service-tag" style="background:#e8f5f0;color:#2e7d5e;">For Residents</span>
+    </a>
+    <a href="user-login.html" class="service-card">
+      <div class="service-icon" style="background:#fef0e7;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#e07b39" stroke-width="2"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg>
+      </div>
+      <h3>AI Symptom Checker</h3>
+      <p>Speak or type your symptoms. Our AI powered by Google Gemini will tell you if it's an emergency, needs a doctor, or can heal on its own.</p>
+      <span class="service-tag" style="background:#fef0e7;color:#e07b39;">AI Powered</span>
+    </a>
+  </div>
+</section>
+
+<!-- About -->
+<div class="about-section" id="about">
+  <div class="about-inner">
+    <div class="about-img">
+      <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="100" cy="70" r="35" fill="#2e7d5e" opacity="0.15"/>
+        <circle cx="100" cy="70" r="25" fill="#2e7d5e" opacity="0.3"/>
+        <path d="M65 150c0-19.3 15.7-35 35-35s35 15.7 35 35" fill="#2e7d5e" opacity="0.2"/>
+        <rect x="85" y="55" width="30" height="30" rx="15" fill="#2e7d5e"/>
+        <path d="M95 70h10M100 65v10" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+        <rect x="60" y="110" width="80" height="50" rx="12" fill="#2e7d5e" opacity="0.15"/>
+        <path d="M80 125h40M80 135h30M80 145h20" stroke="#2e7d5e" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+      </svg>
+    </div>
+    <div class="about-text">
+      <span class="section-badge">About Us</span>
+      <h2>Jeevan Sandhya Old Age Home</h2>
+      <p>Located in the heart of Naranpura, Ahmedabad, Jeevan Sandhya is dedicated to providing compassionate care and a dignified life for our elderly residents.</p>
+      <p>The Jeevan Health Assistant platform was created to bring technology closer to our residents — making health management simple, safe, and stress-free.</p>
+      <ul class="features-list">
+        <li><span class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span> Doctor-managed medicine schedules</li>
+        <li><span class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span> AI-powered health guidance in seconds</li>
+        <li><span class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span> Admin tracks resident activity & wellbeing</li>
+        <li><span class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span> Available 24 hours, 7 days a week</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Login CTA -->
+<div class="login-section">
+  <span class="section-badge">Get Started</span>
+  <h2>Access Your Dashboard</h2>
+  <p>Login as admin to manage residents, or as a resident to view your medicines and check symptoms.</p>
+  <div class="login-btns">
+    <a href="admin-login.html" class="btn-login btn-admin">Admin / Doctor Login</a>
+    <a href="user-login.html" class="btn-login btn-user">Resident Login</a>
+  </div>
+</div>
+
+<!-- Contact -->
+<section class="contact-section" id="contact">
+  <div class="contact-info">
+    <span class="section-badge">Contact Us</span>
+    <h2>Jeevan Sandhya</h2>
+    <div class="contact-item">
+      <div class="contact-item-icon">
+        <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      </div>
+      <div>
+        <div class="contact-item-label">Address</div>
+        <div class="contact-item-value">132 feet Ring Road, Gharda Ghar Rd,<br>near Ankur Bus Stop, Naranpura,<br>Ahmedabad, Gujarat 380013</div>
+      </div>
+    </div>
+    <div class="contact-item">
+      <div class="contact-item-icon">
+        <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.01 1.18 2 2 0 012 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14v2.92z"/></svg>
+      </div>
+      <div>
+        <div class="contact-item-label">Phone</div>
+        <div class="contact-item-value">079 2747 5521</div>
+      </div>
+    </div>
+  </div>
+  <div class="contact-form">
+    <h3>Send us a message</h3>
+    <div class="form-group">
+      <label>Your Name</label>
+      <input type="text" placeholder="Enter your name"/>
+    </div>
+    <div class="form-group">
+      <label>Phone Number</label>
+      <input type="tel" placeholder="Enter your phone"/>
+    </div>
+    <div class="form-group">
+      <label>Message</label>
+      <textarea placeholder="Write your message here..."></textarea>
+    </div>
+    <button class="btn-submit" onclick="alert('Thank you! We will contact you soon.')">Send Message</button>
+  </div>
+</section>
+
+<footer>
+  <p>© 2025 Jeevan Health Assistant &nbsp;|&nbsp; Jeevan Sandhya Old Age Home, Ahmedabad &nbsp;|&nbsp; Made with <span>♥</span> for our elders</p>
+</footer>
+
+</body>
+</html>

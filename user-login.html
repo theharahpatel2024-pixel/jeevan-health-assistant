@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Resident Login – Jeevan Health Assistant</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    :root{--green:#2e7d5e;--green-light:#e8f5f0;--green-dark:#1a5c43;--orange:#e07b39;--text:#1a1a2e;--muted:#5a6a7a;}
+    body{font-family:'Poppins',sans-serif;background:#fef6f0;min-height:100vh;display:flex;align-items:center;justify-content:center;}
+    .login-box{background:white;border-radius:24px;padding:3rem;width:100%;max-width:420px;box-shadow:0 8px 40px rgba(0,0,0,0.10);}
+    .logo{text-align:center;margin-bottom:2rem;}
+    .logo-icon{width:60px;height:60px;background:var(--orange);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 0.8rem;}
+    .logo-icon svg{width:30px;height:30px;fill:white;}
+    .logo h2{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--text);}
+    .logo p{font-size:0.82rem;color:var(--muted);margin-top:0.2rem;}
+    .badge{display:inline-block;background:#fef0e7;color:#e07b39;font-size:0.75rem;font-weight:600;padding:0.25rem 0.8rem;border-radius:20px;margin-bottom:1.5rem;}
+    .form-group{margin-bottom:1.2rem;}
+    .form-group label{display:block;font-size:0.82rem;font-weight:600;color:var(--muted);margin-bottom:0.5rem;}
+    .form-group input{width:100%;padding:0.85rem 1rem;border:1.5px solid #e2e8f0;border-radius:12px;font-family:'Poppins',sans-serif;font-size:0.9rem;outline:none;transition:border 0.2s;}
+    .form-group input:focus{border-color:var(--orange);}
+    .btn{width:100%;background:var(--orange);color:white;padding:0.9rem;border:none;border-radius:12px;font-family:'Poppins',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:background 0.2s;margin-top:0.5rem;}
+    .btn:hover{background:#c96a2a;}
+    .error{background:#fee2e2;color:#dc2626;padding:0.75rem 1rem;border-radius:10px;font-size:0.85rem;margin-bottom:1rem;display:none;}
+    .back-link{text-align:center;margin-top:1.5rem;}
+    .back-link a{color:var(--muted);font-size:0.85rem;text-decoration:none;}
+    .back-link a:hover{color:var(--orange);}
+    .loading{display:none;text-align:center;color:var(--muted);font-size:0.9rem;margin-top:1rem;}
+  </style>
+</head>
+<body>
+
+<div class="login-box">
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+    </div>
+    <h2>Jeevan Health Assistant</h2>
+    <p>Jeevan Sandhya Old Age Home</p>
+  </div>
+
+  <div style="text-align:center;">
+    <span class="badge">👴 Resident Login</span>
+  </div>
+
+  <div class="error" id="errorMsg"></div>
+
+  <div class="form-group">
+    <label>Email Address</label>
+    <input type="email" id="email" placeholder="Enter your email"/>
+  </div>
+  <div class="form-group">
+    <label>Password</label>
+    <input type="password" id="password" placeholder="Enter your password"/>
+  </div>
+  <button class="btn" onclick="userLogin()">Login</button>
+  <div class="loading" id="loading">Logging in...</div>
+
+  <div class="back-link">
+    <a href="index.html">← Back to Home</a> &nbsp;|&nbsp;
+    <a href="admin-login.html">Admin Login →</a>
+  </div>
+</div>
+
+<script type="module">
+  import { auth, db } from './firebase.js';
+  import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  window.userLogin = async function() {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const errorMsg = document.getElementById('errorMsg');
+    const loading = document.getElementById('loading');
+
+    errorMsg.style.display = 'none';
+
+    if (!email || !password) {
+      errorMsg.textContent = 'Please enter email and password.';
+      errorMsg.style.display = 'block';
+      return;
+    }
+
+    loading.style.display = 'block';
+
+    try {
+      const userCred = await signInWithEmailAndPassword(auth, email, password);
+      const userDoc = await getDoc(doc(db, 'users', userCred.user.uid));
+
+      if (userDoc.exists() && userDoc.data().role === 'user') {
+        // Log last login time
+        await updateDoc(doc(db, 'users', userCred.user.uid), {
+          lastLogin: serverTimestamp()
+        });
+        sessionStorage.setItem('jha_role', 'user');
+        sessionStorage.setItem('jha_uid', userCred.user.uid);
+        sessionStorage.setItem('jha_name', userDoc.data().name || 'Resident');
+        window.location.href = 'user-dashboard.html';
+      } else {
+        errorMsg.textContent = 'Account not found. Please contact admin.';
+        errorMsg.style.display = 'block';
+        await auth.signOut();
+      }
+    } catch (err) {
+      errorMsg.textContent = 'Invalid email or password. Please try again.';
+      errorMsg.style.display = 'block';
+    }
+
+    loading.style.display = 'none';
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') window.userLogin();
+  });
+</script>
+
+</body>
+</html>

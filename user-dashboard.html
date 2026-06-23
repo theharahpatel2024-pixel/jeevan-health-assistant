@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Dashboard – Jeevan Health Assistant</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    :root{--green:#2e7d5e;--green-light:#e8f5f0;--green-dark:#1a5c43;--orange:#e07b39;--text:#1a1a2e;--muted:#5a6a7a;--bg:#f7faf9;}
+    body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);}
+
+    nav{background:var(--green-dark);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;}
+    .nav-brand{color:white;font-family:'Playfair Display',serif;font-size:1.2rem;}
+    .nav-brand span{font-size:0.75rem;font-family:'Poppins',sans-serif;opacity:0.7;display:block;}
+    .nav-right{display:flex;align-items:center;gap:1rem;}
+    .user-name{color:white;font-size:0.85rem;}
+    .btn-logout{background:rgba(255,255,255,0.15);color:white;padding:0.4rem 1rem;border:none;border-radius:20px;cursor:pointer;font-family:'Poppins',sans-serif;font-size:0.85rem;}
+    .btn-logout:hover{background:rgba(255,255,255,0.25);}
+
+    .content{padding:2rem;max-width:900px;margin:0 auto;}
+
+    /* Welcome */
+    .welcome{background:linear-gradient(135deg,var(--green),var(--green-dark));color:white;border-radius:20px;padding:2rem;margin-bottom:2rem;}
+    .welcome h2{font-family:'Playfair Display',serif;font-size:1.8rem;margin-bottom:0.4rem;}
+    .welcome p{opacity:0.85;font-size:0.9rem;}
+
+    /* Section cards */
+    .card{background:white;border-radius:20px;padding:1.5rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:1.5rem;}
+    .card-title{font-size:1.1rem;font-weight:600;display:flex;align-items:center;gap:0.6rem;margin-bottom:1.2rem;}
+    .card-title span{font-size:1.3rem;}
+
+    /* Medicine cards */
+    .med-card{background:var(--green-light);border-radius:14px;padding:1.2rem;margin-bottom:1rem;display:flex;align-items:center;gap:1rem;}
+    .med-icon{width:44px;height:44px;background:var(--green);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:white;font-size:1.3rem;}
+    .med-info{flex:1;}
+    .med-name{font-weight:600;font-size:0.95rem;}
+    .med-inst{font-size:0.8rem;color:var(--muted);margin-top:0.2rem;}
+    .med-times{display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem;}
+    .time-pill{background:white;color:var(--green);font-size:0.75rem;font-weight:600;padding:0.2rem 0.7rem;border-radius:20px;border:1.5px solid var(--green);}
+    .reminder-bell{font-size:1.2rem;cursor:pointer;}
+
+    /* Symptom checker */
+    .symptom-area{border:2px dashed #d1e7de;border-radius:14px;padding:1.5rem;text-align:center;margin-bottom:1rem;background:var(--green-light);}
+    .mic-btn{background:var(--orange);color:white;border:none;border-radius:50%;width:70px;height:70px;font-size:2rem;cursor:pointer;transition:all 0.2s;margin:0 auto;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(224,123,57,0.35);}
+    .mic-btn:hover{transform:scale(1.05);background:#c96a2a;}
+    .mic-btn.recording{background:#dc2626;animation:pulse 1s infinite;}
+    @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,0.4);}50%{box-shadow:0 0 0 12px rgba(220,38,38,0);}}
+    .mic-label{margin-top:0.8rem;font-size:0.85rem;color:var(--muted);}
+    .symptom-input{width:100%;padding:0.85rem;border:1.5px solid #e2e8f0;border-radius:12px;font-family:'Poppins',sans-serif;font-size:0.9rem;outline:none;margin-top:1rem;resize:vertical;min-height:80px;}
+    .symptom-input:focus{border-color:var(--green);}
+    .btn-check{background:var(--green);color:white;padding:0.8rem 2rem;border:none;border-radius:30px;font-family:'Poppins',sans-serif;font-size:0.95rem;font-weight:600;cursor:pointer;margin-top:1rem;transition:background 0.2s;}
+    .btn-check:hover{background:var(--green-dark);}
+    .btn-check:disabled{background:#a0b5ae;cursor:not-allowed;}
+
+    /* AI Result */
+    .ai-result{border-radius:16px;padding:1.5rem;margin-top:1rem;display:none;}
+    .ai-result.emergency{background:#fee2e2;border:2px solid #dc2626;}
+    .ai-result.doctor{background:#fff3e0;border:2px solid var(--orange);}
+    .ai-result.ok{background:#e8f5f0;border:2px solid var(--green);}
+    .ai-result-title{font-size:1rem;font-weight:700;margin-bottom:0.8rem;display:flex;align-items:center;gap:0.5rem;}
+    .ai-result-body{font-size:0.9rem;line-height:1.7;color:var(--text);}
+    .loading-dots{display:inline-block;}
+    .loading-dots::after{content:'...';animation:dots 1.5s infinite;}
+    @keyframes dots{0%{content:'.';}33%{content:'..';}66%{content:'...';}100%{content:'';}}
+
+    .empty-state{text-align:center;color:var(--muted);padding:1.5rem;font-size:0.9rem;}
+
+    @media(max-width:600px){
+      .content{padding:1rem;}
+      .welcome{padding:1.5rem;}
+      nav{padding:1rem;}
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">
+    Jeevan Health Assistant
+    <span>Resident Portal</span>
+  </div>
+  <div class="nav-right">
+    <span class="user-name" id="userName">Resident</span>
+    <button class="btn-logout" onclick="logout()">Logout</button>
+  </div>
+</nav>
+
+<div class="content">
+
+  <!-- Welcome -->
+  <div class="welcome">
+    <h2>Namaste, <span id="welcomeName">Resident</span> 🙏</h2>
+    <p>Welcome to Jeevan Health Assistant. Check your medicines and use the symptom checker below.</p>
+  </div>
+
+  <!-- Medicines Section -->
+  <div class="card">
+    <div class="card-title"><span>💊</span> Your Medicine Schedule</div>
+    <div id="medicinesList"><div class="empty-state">Loading your medicines...</div></div>
+  </div>
+
+  <!-- Symptom Checker -->
+  <div class="card">
+    <div class="card-title"><span>🎤</span> AI Symptom Checker</div>
+    <p style="font-size:0.88rem;color:var(--muted);margin-bottom:1rem;">Tell us how you are feeling. Speak or type your symptoms — our AI will guide you.</p>
+
+    <div class="symptom-area">
+      <button class="mic-btn" id="micBtn" onclick="toggleMic()">🎤</button>
+      <div class="mic-label" id="micLabel">Tap the mic to speak your symptoms</div>
+    </div>
+
+    <textarea class="symptom-input" id="symptomText" placeholder="Or type your symptoms here... e.g. I have chest pain and shortness of breath since morning"></textarea>
+    <br/>
+    <button class="btn-check" id="checkBtn" onclick="checkSymptoms()">Check Symptoms with AI</button>
+
+    <div class="ai-result" id="aiResult">
+      <div class="ai-result-title" id="aiTitle"></div>
+      <div class="ai-result-body" id="aiBody"></div>
+    </div>
+  </div>
+
+</div>
+
+<script type="module">
+  import { auth, db } from './firebase.js';
+  import { signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { collection, getDocs, addDoc, query, where, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  // =============================================
+  // REPLACE THIS WITH YOUR GEMINI API KEY
+  const GEMINI_API_KEY = "AQ.Ab8RN6JPQyWV57qDfq81Jqu77Sbi1p5dyGyKzYwks5dID_kvkg";
+  // =============================================
+
+  // Auth check
+  const role = sessionStorage.getItem('jha_role');
+  const uid = sessionStorage.getItem('jha_uid');
+  const name = sessionStorage.getItem('jha_name');
+  if(role !== 'user'){ window.location.href = 'user-login.html'; }
+  document.getElementById('userName').textContent = name || 'Resident';
+  document.getElementById('welcomeName').textContent = name || 'Resident';
+
+  // Load medicines
+  async function loadMedicines() {
+    const div = document.getElementById('medicinesList');
+    const snap = await getDocs(query(collection(db,'medicines'), where('residentId','==',uid)));
+    if(snap.empty){ div.innerHTML = '<div class="empty-state">No medicines assigned yet. Your doctor will add them soon.</div>'; return; }
+    div.innerHTML = '';
+    snap.forEach(d => {
+      const data = d.data();
+      const timePills = data.times.map(t => `<span class="time-pill">${t}</span>`).join('');
+      div.innerHTML += `<div class="med-card">
+        <div class="med-icon">💊</div>
+        <div class="med-info">
+          <div class="med-name">${data.name}</div>
+          <div class="med-inst">${data.instructions || 'Take as directed'}</div>
+          <div class="med-times">${timePills}</div>
+        </div>
+        <span class="reminder-bell" title="Reminder active">🔔</span>
+      </div>`;
+    });
+
+    // Log medicine view
+    await addDoc(collection(db,'activity'), {
+      type:'medicine', action:`Viewed medicine schedule`,
+      userName: name || 'Resident', userId: uid, timestamp: serverTimestamp()
+    });
+
+    // Set up reminders
+    setupReminders(snap);
+  }
+
+  // Medicine reminders
+  function setupReminders(snap) {
+    snap.forEach(d => {
+      const data = d.data();
+      data.times.forEach(t => {
+        const [h, m] = t.split(':').map(Number);
+        const now = new Date();
+        const reminderTime = new Date();
+        reminderTime.setHours(h, m, 0, 0);
+        if(reminderTime > now) {
+          const diff = reminderTime - now;
+          setTimeout(() => {
+            if(Notification.permission === 'granted') {
+              new Notification(`💊 Medicine Reminder`, {
+                body: `Time to take: ${data.name}. ${data.instructions || ''}`,
+                icon: ''
+              });
+            } else {
+              alert(`⏰ Medicine Reminder!\nTime to take: ${data.name}\n${data.instructions || ''}`);
+            }
+          }, diff);
+        }
+      });
+    });
+    // Request notification permission
+    if(Notification.permission === 'default') Notification.requestPermission();
+  }
+
+  // Voice recognition
+  let recognition = null;
+  let isRecording = false;
+
+  window.toggleMic = function() {
+    if(!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)){
+      alert('Voice recognition not supported in this browser. Please type your symptoms.');
+      return;
+    }
+    if(isRecording){ recognition.stop(); return; }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRecognition();
+    recognition.lang = 'en-IN';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.onstart = () => {
+      isRecording = true;
+      document.getElementById('micBtn').classList.add('recording');
+      document.getElementById('micLabel').textContent = 'Listening... speak now';
+    };
+    recognition.onresult = (e) => {
+      const transcript = e.results[0][0].transcript;
+      document.getElementById('symptomText').value = transcript;
+      document.getElementById('micLabel').textContent = '✅ Got it! Now click "Check Symptoms"';
+    };
+    recognition.onerror = () => {
+      document.getElementById('micLabel').textContent = 'Could not hear. Please type symptoms below.';
+    };
+    recognition.onend = () => {
+      isRecording = false;
+      document.getElementById('micBtn').classList.remove('recording');
+    };
+    recognition.start();
+  }
+
+  // AI Symptom Check
+  window.checkSymptoms = async function() {
+    const symptoms = document.getElementById('symptomText').value.trim();
+    if(!symptoms){ alert('Please describe your symptoms first.'); return; }
+
+    const btn = document.getElementById('checkBtn');
+    const result = document.getElementById('aiResult');
+    const aiTitle = document.getElementById('aiTitle');
+    const aiBody = document.getElementById('aiBody');
+
+    btn.disabled = true;
+    btn.textContent = 'Analyzing';
+    result.style.display = 'block';
+    result.className = 'ai-result ok';
+    aiTitle.innerHTML = '🤔 AI is analyzing your symptoms<span class="loading-dots"></span>';
+    aiBody.textContent = '';
+
+    try {
+      const prompt = `You are a compassionate medical AI assistant for Jeevan Sandhya Old Age Home. 
+An elderly resident has described their symptoms. Analyze and respond in simple, clear language.
+
+Symptoms: "${symptoms}"
+
+Respond in this exact format:
+STATUS: [EMERGENCY / SEE_DOCTOR / SELF_CARE]
+TITLE: [A short caring title]
+EXPLANATION: [2-3 sentences explaining what might be happening in simple words]
+ADVICE: [2-3 specific things they should do right now]
+NOTE: [Any important warning or reassurance]
+
+Keep the language simple, warm, and easy to understand for elderly people. Do not use medical jargon.`;
+
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({contents:[{parts:[{text:prompt}]}]})
+      });
+
+      const data = await response.json();
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+      // Parse response
+      const statusMatch = text.match(/STATUS:\s*(.*)/);
+      const titleMatch = text.match(/TITLE:\s*(.*)/);
+      const explanationMatch = text.match(/EXPLANATION:\s*([\s\S]*?)(?=ADVICE:|$)/);
+      const adviceMatch = text.match(/ADVICE:\s*([\s\S]*?)(?=NOTE:|$)/);
+      const noteMatch = text.match(/NOTE:\s*([\s\S]*)/);
+
+      const status = statusMatch?.[1]?.trim() || 'SELF_CARE';
+      const title = titleMatch?.[1]?.trim() || 'Symptom Analysis';
+      const explanation = explanationMatch?.[1]?.trim() || '';
+      const advice = adviceMatch?.[1]?.trim() || '';
+      const note = noteMatch?.[1]?.trim() || '';
+
+      // Set result style
+      if(status === 'EMERGENCY'){
+        result.className = 'ai-result emergency';
+        aiTitle.innerHTML = '🚨 ' + title;
+      } else if(status === 'SEE_DOCTOR'){
+        result.className = 'ai-result doctor';
+        aiTitle.innerHTML = '🏥 ' + title;
+      } else {
+        result.className = 'ai-result ok';
+        aiTitle.innerHTML = '✅ ' + title;
+      }
+
+      aiBody.innerHTML = `
+        <p><b>What's happening:</b> ${explanation}</p>
+        <br/>
+        <p><b>What to do:</b></p>
+        <p>${advice.replace(/\n/g,'<br/>')}</p>
+        ${note ? `<br/><p style="font-style:italic;color:#5a6a7a;font-size:0.85rem;">📌 ${note}</p>` : ''}
+        ${status === 'EMERGENCY' ? '<br/><p style="font-weight:700;color:#dc2626;font-size:1rem;">📞 Call emergency services or go to hospital IMMEDIATELY!</p>' : ''}
+      `;
+
+      // Log symptom check activity
+      await addDoc(collection(db,'activity'), {
+        type:'symptom', action:`Used AI Symptom Checker — Result: ${status}`,
+        userName: name || 'Resident', userId: uid, timestamp: serverTimestamp()
+      });
+
+    } catch(err) {
+      result.className = 'ai-result doctor';
+      aiTitle.innerHTML = '⚠️ Could not analyze';
+      aiBody.textContent = 'Sorry, the AI could not analyze your symptoms right now. Please contact your doctor or nurse directly.';
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Check Symptoms with AI';
+  }
+
+  // Logout
+  window.logout = async function() {
+    await signOut(auth);
+    sessionStorage.clear();
+    window.location.href = 'index.html';
+  }
+
+  // Init
+  loadMedicines();
+</script>
+
+</body>
+</html>

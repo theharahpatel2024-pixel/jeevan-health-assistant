@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard – Jeevan Health Assistant</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    :root{--green:#2e7d5e;--green-light:#e8f5f0;--green-dark:#1a5c43;--orange:#e07b39;--text:#1a1a2e;--muted:#5a6a7a;--bg:#f7faf9;}
+    body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);}
+
+    /* Navbar */
+    nav{background:var(--green-dark);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;}
+    .nav-brand{color:white;font-family:'Playfair Display',serif;font-size:1.2rem;}
+    .nav-brand span{font-size:0.75rem;font-family:'Poppins',sans-serif;opacity:0.7;display:block;}
+    .nav-right{display:flex;align-items:center;gap:1rem;}
+    .admin-name{color:white;font-size:0.85rem;opacity:0.9;}
+    .btn-logout{background:rgba(255,255,255,0.15);color:white;padding:0.4rem 1rem;border:none;border-radius:20px;cursor:pointer;font-family:'Poppins',sans-serif;font-size:0.85rem;transition:background 0.2s;}
+    .btn-logout:hover{background:rgba(255,255,255,0.25);}
+
+    /* Tabs */
+    .tabs{background:white;border-bottom:2px solid #e2e8f0;display:flex;padding:0 2rem;}
+    .tab{padding:1rem 1.5rem;cursor:pointer;font-size:0.9rem;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s;}
+    .tab.active{color:var(--green);border-bottom-color:var(--green);}
+    .tab:hover{color:var(--green);}
+
+    /* Content */
+    .content{padding:2rem;max-width:1100px;margin:0 auto;}
+
+    /* Stats row */
+    .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:2rem;}
+    .stat-card{background:white;border-radius:16px;padding:1.5rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);}
+    .stat-card-num{font-size:2rem;font-weight:700;color:var(--green);}
+    .stat-card-label{font-size:0.82rem;color:var(--muted);margin-top:0.3rem;}
+
+    /* Section card */
+    .card{background:white;border-radius:16px;padding:1.5rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:1.5rem;}
+    .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;}
+    .card-title{font-size:1rem;font-weight:600;}
+    .btn-green{background:var(--green);color:white;padding:0.5rem 1.2rem;border:none;border-radius:24px;font-family:'Poppins',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;transition:background 0.2s;}
+    .btn-green:hover{background:var(--green-dark);}
+
+    /* Form row */
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;}
+    .form-group{display:flex;flex-direction:column;gap:0.4rem;}
+    .form-group label{font-size:0.8rem;font-weight:600;color:var(--muted);}
+    .form-group input,.form-group select{padding:0.7rem 0.9rem;border:1.5px solid #e2e8f0;border-radius:10px;font-family:'Poppins',sans-serif;font-size:0.88rem;outline:none;transition:border 0.2s;}
+    .form-group input:focus,.form-group select:focus{border-color:var(--green);}
+
+    /* Table */
+    table{width:100%;border-collapse:collapse;}
+    th{text-align:left;font-size:0.78rem;font-weight:600;color:var(--muted);padding:0.6rem 0.8rem;border-bottom:2px solid #e2e8f0;text-transform:uppercase;letter-spacing:0.04em;}
+    td{padding:0.8rem;font-size:0.88rem;border-bottom:1px solid #f0f4f8;vertical-align:middle;}
+    tr:last-child td{border-bottom:none;}
+    tr:hover td{background:#fafcfb;}
+    .badge-role{display:inline-block;font-size:0.72rem;font-weight:600;padding:0.2rem 0.7rem;border-radius:12px;}
+    .badge-active{background:#e8f5f0;color:var(--green);}
+    .badge-inactive{background:#f0f4f8;color:var(--muted);}
+
+    /* Medicine times */
+    .time-badge{display:inline-block;background:var(--green-light);color:var(--green);font-size:0.72rem;font-weight:600;padding:0.15rem 0.6rem;border-radius:8px;margin:0.1rem;}
+
+    /* Activity log */
+    .activity-item{display:flex;align-items:center;gap:1rem;padding:0.8rem 0;border-bottom:1px solid #f0f4f8;}
+    .activity-item:last-child{border-bottom:none;}
+    .activity-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+    .dot-login{background:#3b82f6;}
+    .dot-medicine{background:var(--green);}
+    .dot-symptom{background:var(--orange);}
+    .activity-text{font-size:0.88rem;flex:1;}
+    .activity-time{font-size:0.78rem;color:var(--muted);}
+
+    /* Tab panels */
+    .tab-panel{display:none;}
+    .tab-panel.active{display:block;}
+
+    /* Alert */
+    .alert{padding:0.75rem 1rem;border-radius:10px;font-size:0.85rem;margin-bottom:1rem;display:none;}
+    .alert-success{background:#e8f5f0;color:var(--green-dark);}
+    .alert-error{background:#fee2e2;color:#dc2626;}
+
+    .btn-del{background:none;border:none;color:#dc2626;cursor:pointer;font-size:0.82rem;font-family:'Poppins',sans-serif;padding:0.3rem 0.6rem;border-radius:8px;transition:background 0.2s;}
+    .btn-del:hover{background:#fee2e2;}
+    .empty-state{text-align:center;color:var(--muted);padding:2rem;font-size:0.9rem;}
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">
+    Jeevan Health Assistant
+    <span>Admin Dashboard</span>
+  </div>
+  <div class="nav-right">
+    <span class="admin-name" id="adminName">Admin</span>
+    <button class="btn-logout" onclick="logout()">Logout</button>
+  </div>
+</nav>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('overview')">📊 Overview</div>
+  <div class="tab" onclick="switchTab('patients')">👴 Residents</div>
+  <div class="tab" onclick="switchTab('medicines')">💊 Medicines</div>
+  <div class="tab" onclick="switchTab('activity')">📋 Activity Log</div>
+</div>
+
+<div class="content">
+
+  <!-- OVERVIEW TAB -->
+  <div class="tab-panel active" id="tab-overview">
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-card-num" id="totalResidents">0</div>
+        <div class="stat-card-label">Total Residents</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-num" id="totalMedicines">0</div>
+        <div class="stat-card-label">Medicine Schedules</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-num" id="totalActivity">0</div>
+        <div class="stat-card-label">Activities Today</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div class="card-title">Recent Activity</div></div>
+      <div id="recentActivity"><div class="empty-state">No activity yet.</div></div>
+    </div>
+  </div>
+
+  <!-- PATIENTS TAB -->
+  <div class="tab-panel" id="tab-patients">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Add New Resident</div>
+      </div>
+      <div class="alert" id="patientAlert"></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="pName" placeholder="Resident's full name"/>
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="pEmail" placeholder="Login email for resident"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Password (for resident login)</label>
+          <input type="text" id="pPassword" placeholder="Set a password"/>
+        </div>
+        <div class="form-group">
+          <label>Room Number</label>
+          <input type="text" id="pRoom" placeholder="e.g. 101"/>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:1rem;">
+        <label>Age</label>
+        <input type="number" id="pAge" placeholder="Age"/>
+      </div>
+      <button class="btn-green" onclick="addResident()">+ Add Resident</button>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div class="card-title">All Residents</div></div>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th><th>Email</th><th>Room</th><th>Age</th><th>Last Login</th><th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="residentsTable">
+          <tr><td colspan="6" class="empty-state">No residents added yet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- MEDICINES TAB -->
+  <div class="tab-panel" id="tab-medicines">
+    <div class="card">
+      <div class="card-header"><div class="card-title">Add Medicine Schedule</div></div>
+      <div class="alert" id="medAlert"></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Select Resident</label>
+          <select id="mResident">
+            <option value="">-- Select Resident --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Medicine Name</label>
+          <input type="text" id="mName" placeholder="e.g. Metformin 500mg"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Reminder Times (comma separated)</label>
+          <input type="text" id="mTimes" placeholder="e.g. 08:00, 14:00, 20:00"/>
+        </div>
+        <div class="form-group">
+          <label>Instructions</label>
+          <input type="text" id="mInstructions" placeholder="e.g. After food with water"/>
+        </div>
+      </div>
+      <button class="btn-green" onclick="addMedicine()">+ Add Medicine</button>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div class="card-title">All Medicine Schedules</div></div>
+      <table>
+        <thead>
+          <tr><th>Resident</th><th>Medicine</th><th>Times</th><th>Instructions</th><th>Action</th></tr>
+        </thead>
+        <tbody id="medicinesTable">
+          <tr><td colspan="5" class="empty-state">No medicines added yet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ACTIVITY TAB -->
+  <div class="tab-panel" id="tab-activity">
+    <div class="card">
+      <div class="card-header"><div class="card-title">Full Activity Log</div></div>
+      <div id="fullActivity"><div class="empty-state">No activity recorded yet.</div></div>
+    </div>
+  </div>
+
+</div>
+
+<script type="module">
+  import { auth, db } from './firebase.js';
+  import { signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { collection, addDoc, getDocs, doc, setDoc, deleteDoc, query, orderBy, limit, where, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  // Auth check
+  const role = sessionStorage.getItem('jha_role');
+  const adminName = sessionStorage.getItem('jha_name');
+  if (role !== 'admin') { window.location.href = 'admin-login.html'; }
+  document.getElementById('adminName').textContent = adminName || 'Admin';
+
+  // Tab switching
+  window.switchTab = function(tab) {
+    document.querySelectorAll('.tab').forEach((t,i) => t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    const tabs = ['overview','patients','medicines','activity'];
+    document.querySelectorAll('.tab')[tabs.indexOf(tab)].classList.add('active');
+    document.getElementById('tab-'+tab).classList.add('active');
+    if(tab === 'medicines') loadResidentsDropdown();
+    if(tab === 'medicines') loadMedicines();
+    if(tab === 'activity') loadFullActivity();
+    if(tab === 'patients') loadResidents();
+  }
+
+  // Load stats
+  async function loadStats() {
+    const usersSnap = await getDocs(query(collection(db,'users'), where('role','==','user')));
+    document.getElementById('totalResidents').textContent = usersSnap.size;
+
+    const medsSnap = await getDocs(collection(db,'medicines'));
+    document.getElementById('totalMedicines').textContent = medsSnap.size;
+
+    const today = new Date(); today.setHours(0,0,0,0);
+    const actSnap = await getDocs(query(collection(db,'activity'), where('timestamp','>=',today)));
+    document.getElementById('totalActivity').textContent = actSnap.size;
+  }
+
+  // Load recent activity
+  async function loadRecentActivity() {
+    const q = query(collection(db,'activity'), orderBy('timestamp','desc'), limit(10));
+    const snap = await getDocs(q);
+    const div = document.getElementById('recentActivity');
+    if(snap.empty){ div.innerHTML = '<div class="empty-state">No activity yet.</div>'; return; }
+    div.innerHTML = '';
+    snap.forEach(d => {
+      const data = d.data();
+      const dotClass = data.type === 'login' ? 'dot-login' : data.type === 'medicine' ? 'dot-medicine' : 'dot-symptom';
+      const time = data.timestamp?.toDate ? data.timestamp.toDate().toLocaleString('en-IN') : '';
+      div.innerHTML += `<div class="activity-item">
+        <div class="activity-dot ${dotClass}"></div>
+        <div class="activity-text"><b>${data.userName || 'Unknown'}</b> — ${data.action}</div>
+        <div class="activity-time">${time}</div>
+      </div>`;
+    });
+  }
+
+  // Add resident
+  window.addResident = async function() {
+    const name = document.getElementById('pName').value.trim();
+    const email = document.getElementById('pEmail').value.trim();
+    const password = document.getElementById('pPassword').value.trim();
+    const room = document.getElementById('pRoom').value.trim();
+    const age = document.getElementById('pAge').value.trim();
+    const alert = document.getElementById('patientAlert');
+
+    if(!name||!email||!password||!room){
+      showAlert(alert,'Please fill all required fields.','error'); return;
+    }
+
+    try {
+      // Save admin session
+      const adminUid = sessionStorage.getItem('jha_uid');
+      const adminEmail = auth.currentUser?.email;
+
+      // Create user account
+      const userCred = await createUserWithEmailAndPassword(auth, email, password);
+      await setDoc(doc(db,'users',userCred.user.uid), {
+        name, email, room, age: age || '', role: 'user',
+        createdAt: serverTimestamp(), lastLogin: null
+      });
+
+      // Log activity
+      await addDoc(collection(db,'activity'), {
+        type:'admin', action:`New resident added: ${name} (Room ${room})`,
+        userName: adminName || 'Admin', timestamp: serverTimestamp()
+      });
+
+      // Sign back in as admin
+      await signOut(auth);
+      // Re-login admin - we store the session but Firebase signs out
+      // Workaround: reload page
+      showAlert(alert, `Resident ${name} added successfully! Page will reload.`, 'success');
+      setTimeout(() => window.location.reload(), 2000);
+
+    } catch(err) {
+      showAlert(alert, 'Error: ' + (err.message || 'Could not add resident.'), 'error');
+    }
+  }
+
+  // Load residents table
+  async function loadResidents() {
+    const snap = await getDocs(query(collection(db,'users'), where('role','==','user')));
+    const tbody = document.getElementById('residentsTable');
+    if(snap.empty){ tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No residents added yet.</td></tr>'; return; }
+    tbody.innerHTML = '';
+    snap.forEach(d => {
+      const data = d.data();
+      const lastLogin = data.lastLogin?.toDate ? data.lastLogin.toDate().toLocaleDateString('en-IN') : 'Never';
+      tbody.innerHTML += `<tr>
+        <td><b>${data.name}</b></td>
+        <td>${data.email}</td>
+        <td>${data.room}</td>
+        <td>${data.age || '-'}</td>
+        <td>${lastLogin}</td>
+        <td><button class="btn-del" onclick="deleteResident('${d.id}','${data.name}')">Remove</button></td>
+      </tr>`;
+    });
+  }
+
+  window.deleteResident = async function(uid, name) {
+    if(!confirm(`Remove resident ${name}? This will delete their data.`)) return;
+    await deleteDoc(doc(db,'users',uid));
+    loadResidents();
+  }
+
+  // Add medicine
+  window.addMedicine = async function() {
+    const residentId = document.getElementById('mResident').value;
+    const residentName = document.getElementById('mResident').selectedOptions[0]?.text;
+    const name = document.getElementById('mName').value.trim();
+    const times = document.getElementById('mTimes').value.trim();
+    const instructions = document.getElementById('mInstructions').value.trim();
+    const alert = document.getElementById('medAlert');
+
+    if(!residentId||!name||!times){
+      showAlert(alert,'Please fill all required fields.','error'); return;
+    }
+
+    try {
+      await addDoc(collection(db,'medicines'), {
+        residentId, residentName, name,
+        times: times.split(',').map(t=>t.trim()),
+        instructions, createdAt: serverTimestamp()
+      });
+      await addDoc(collection(db,'activity'), {
+        type:'medicine', action:`Medicine added for ${residentName}: ${name}`,
+        userName: adminName || 'Admin', timestamp: serverTimestamp()
+      });
+      showAlert(alert, `Medicine "${name}" added for ${residentName}!`, 'success');
+      document.getElementById('mName').value='';
+      document.getElementById('mTimes').value='';
+      document.getElementById('mInstructions').value='';
+      loadMedicines();
+    } catch(err) {
+      showAlert(alert,'Error adding medicine. Try again.','error');
+    }
+  }
+
+  // Load medicines dropdown
+  async function loadResidentsDropdown() {
+    const snap = await getDocs(query(collection(db,'users'), where('role','==','user')));
+    const sel = document.getElementById('mResident');
+    sel.innerHTML = '<option value="">-- Select Resident --</option>';
+    snap.forEach(d => {
+      sel.innerHTML += `<option value="${d.id}">${d.data().name} (Room ${d.data().room})</option>`;
+    });
+  }
+
+  // Load medicines table
+  async function loadMedicines() {
+    const snap = await getDocs(query(collection(db,'medicines'), orderBy('createdAt','desc')));
+    const tbody = document.getElementById('medicinesTable');
+    if(snap.empty){ tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No medicines added yet.</td></tr>'; return; }
+    tbody.innerHTML = '';
+    snap.forEach(d => {
+      const data = d.data();
+      const timeBadges = data.times.map(t => `<span class="time-badge">${t}</span>`).join('');
+      tbody.innerHTML += `<tr>
+        <td>${data.residentName}</td>
+        <td><b>${data.name}</b></td>
+        <td>${timeBadges}</td>
+        <td>${data.instructions || '-'}</td>
+        <td><button class="btn-del" onclick="deleteMedicine('${d.id}')">Remove</button></td>
+      </tr>`;
+    });
+  }
+
+  window.deleteMedicine = async function(id) {
+    if(!confirm('Remove this medicine schedule?')) return;
+    await deleteDoc(doc(db,'medicines',id));
+    loadMedicines();
+  }
+
+  // Full activity log
+  async function loadFullActivity() {
+    const q = query(collection(db,'activity'), orderBy('timestamp','desc'), limit(50));
+    const snap = await getDocs(q);
+    const div = document.getElementById('fullActivity');
+    if(snap.empty){ div.innerHTML = '<div class="empty-state">No activity recorded yet.</div>'; return; }
+    div.innerHTML = '';
+    snap.forEach(d => {
+      const data = d.data();
+      const dotClass = data.type === 'login' ? 'dot-login' : data.type === 'medicine' ? 'dot-medicine' : 'dot-symptom';
+      const time = data.timestamp?.toDate ? data.timestamp.toDate().toLocaleString('en-IN') : '';
+      div.innerHTML += `<div class="activity-item">
+        <div class="activity-dot ${dotClass}"></div>
+        <div class="activity-text"><b>${data.userName || 'Unknown'}</b> — ${data.action}</div>
+        <div class="activity-time">${time}</div>
+      </div>`;
+    });
+  }
+
+  // Logout
+  window.logout = async function() {
+    await signOut(auth);
+    sessionStorage.clear();
+    window.location.href = 'index.html';
+  }
+
+  function showAlert(el, msg, type) {
+    el.textContent = msg;
+    el.className = 'alert alert-' + type;
+    el.style.display = 'block';
+    setTimeout(() => el.style.display = 'none', 4000);
+  }
+
+  // Init
+  loadStats();
+  loadRecentActivity();
+</script>
+
+</body>
+</html>

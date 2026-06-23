@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Login – Jeevan Health Assistant</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    :root{--green:#2e7d5e;--green-light:#e8f5f0;--green-dark:#1a5c43;--text:#1a1a2e;--muted:#5a6a7a;--white:#ffffff;}
+    body{font-family:'Poppins',sans-serif;background:var(--green-light);min-height:100vh;display:flex;align-items:center;justify-content:center;}
+    .login-box{background:white;border-radius:24px;padding:3rem;width:100%;max-width:420px;box-shadow:0 8px 40px rgba(0,0,0,0.10);}
+    .logo{text-align:center;margin-bottom:2rem;}
+    .logo-icon{width:60px;height:60px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 0.8rem;}
+    .logo-icon svg{width:30px;height:30px;fill:white;}
+    .logo h2{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--text);}
+    .logo p{font-size:0.82rem;color:var(--muted);margin-top:0.2rem;}
+    .badge{display:inline-block;background:#fff3e0;color:#e07b39;font-size:0.75rem;font-weight:600;padding:0.25rem 0.8rem;border-radius:20px;margin-bottom:1.5rem;}
+    .form-group{margin-bottom:1.2rem;}
+    .form-group label{display:block;font-size:0.82rem;font-weight:600;color:var(--muted);margin-bottom:0.5rem;}
+    .form-group input{width:100%;padding:0.85rem 1rem;border:1.5px solid #e2e8f0;border-radius:12px;font-family:'Poppins',sans-serif;font-size:0.9rem;outline:none;transition:border 0.2s;}
+    .form-group input:focus{border-color:var(--green);}
+    .btn{width:100%;background:var(--green);color:white;padding:0.9rem;border:none;border-radius:12px;font-family:'Poppins',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:background 0.2s;margin-top:0.5rem;}
+    .btn:hover{background:var(--green-dark);}
+    .error{background:#fee2e2;color:#dc2626;padding:0.75rem 1rem;border-radius:10px;font-size:0.85rem;margin-bottom:1rem;display:none;}
+    .back-link{text-align:center;margin-top:1.5rem;}
+    .back-link a{color:var(--muted);font-size:0.85rem;text-decoration:none;}
+    .back-link a:hover{color:var(--green);}
+    .loading{display:none;text-align:center;color:var(--muted);font-size:0.9rem;margin-top:1rem;}
+  </style>
+</head>
+<body>
+
+<div class="login-box">
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+    </div>
+    <h2>Jeevan Health Assistant</h2>
+    <p>Jeevan Sandhya Old Age Home</p>
+  </div>
+
+  <div style="text-align:center;">
+    <span class="badge">🔐 Admin / Doctor Login</span>
+  </div>
+
+  <div class="error" id="errorMsg"></div>
+
+  <div class="form-group">
+    <label>Email Address</label>
+    <input type="email" id="email" placeholder="Enter admin email"/>
+  </div>
+  <div class="form-group">
+    <label>Password</label>
+    <input type="password" id="password" placeholder="Enter password"/>
+  </div>
+  <button class="btn" onclick="adminLogin()">Login as Admin</button>
+  <div class="loading" id="loading">Logging in...</div>
+
+  <div class="back-link">
+    <a href="index.html">← Back to Home</a> &nbsp;|&nbsp;
+    <a href="user-login.html">Resident Login →</a>
+  </div>
+</div>
+
+<script type="module">
+  import { auth, db } from './firebase.js';
+  import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  window.adminLogin = async function() {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const errorMsg = document.getElementById('errorMsg');
+    const loading = document.getElementById('loading');
+
+    errorMsg.style.display = 'none';
+
+    if (!email || !password) {
+      errorMsg.textContent = 'Please enter email and password.';
+      errorMsg.style.display = 'block';
+      return;
+    }
+
+    loading.style.display = 'block';
+
+    try {
+      const userCred = await signInWithEmailAndPassword(auth, email, password);
+      // Check if user is admin in Firestore
+      const userDoc = await getDoc(doc(db, 'users', userCred.user.uid));
+      if (userDoc.exists() && userDoc.data().role === 'admin') {
+        // Log admin login activity
+        sessionStorage.setItem('jha_role', 'admin');
+        sessionStorage.setItem('jha_uid', userCred.user.uid);
+        sessionStorage.setItem('jha_name', userDoc.data().name || 'Admin');
+        window.location.href = 'admin-dashboard.html';
+      } else {
+        errorMsg.textContent = 'Access denied. This account is not an admin.';
+        errorMsg.style.display = 'block';
+        await auth.signOut();
+      }
+    } catch (err) {
+      errorMsg.textContent = 'Invalid email or password. Please try again.';
+      errorMsg.style.display = 'block';
+    }
+
+    loading.style.display = 'none';
+  }
+
+  // Allow Enter key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') window.adminLogin();
+  });
+</script>
+
+</body>
+</html>
