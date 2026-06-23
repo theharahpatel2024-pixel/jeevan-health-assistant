@@ -4,22 +4,15 @@ const cors = require('cors');
 
 const app = express();
 
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type']
-}));
-
+app.use(cors({ origin: '*' }));
 app.use(express.json());
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-
-app.options('/api/symptom-check', cors());
+const MISTRAL_API_KEY = process.env.MISTRAL_API_KEY;
 
 app.post('/api/symptom-check', async (req, res) => {
   try {
     const { symptoms } = req.body;
-    
+
     const prompt = `You are a compassionate medical AI assistant for Jeevan Sandhya Old Age Home.
 An elderly resident has described their symptoms. Analyze and respond clearly.
 The resident may write in English, Hindi, or Gujarati — understand all three languages.
@@ -35,23 +28,26 @@ NOTE: [Any important warning or reassurance]
 
 Keep language simple and warm for elderly people. Do not use medical jargon.`;
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }]
-        })
-      }
-    );
+    const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${MISTRAL_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'mistral-small-latest',
+        messages: [{ role: 'user', content: prompt }],
+        max_tokens: 500
+      })
+    });
 
     const data = await response.json();
-    console.log('Gemini response status:', response.status);
-    console.log('Gemini data:', JSON.stringify(data).substring(0, 200));
-    
-    res.setHeader('Content-Type', 'application/json');
-    res.json(data);
+    console.log('Mistral status:', response.status);
+    console.log('Mistral data:', JSON.stringify(data).substring(0, 300));
+
+    const text = data.choices?.[0]?.message?.content || '';
+    res.json({ text });
+
   } catch (err) {
     console.error('Error:', err.message);
     res.status(500).json({ error: err.message });
